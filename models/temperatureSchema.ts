@@ -1,6 +1,7 @@
 import {Schema, model} from "mongoose";
 
 interface Temperature {
+    temperature: Number;
     timestamp: Date;
     metadata: {
         sensor: String
@@ -8,7 +9,7 @@ interface Temperature {
 }
 
 
-const tempSchema = new Schema<Temperature>({timestamp:{type: Date}  ,metadata:{type: Object}}, {
+const tempSchema = new Schema<Temperature>({timestamp:{type: Date} , temperature: {type: Number} ,metadata:{type: Object}}, {
     timeseries: {
       timeField: 'timestamp',
       metaField: 'metadata',
@@ -21,7 +22,7 @@ const tempSchema = new Schema<Temperature>({timestamp:{type: Date}  ,metadata:{t
   const TemperatureModel = model<Temperature>('Temperature',tempSchema)
 
   export default TemperatureModel;
-  
+
   // `Test` collection will be a timeseries collection
   
   

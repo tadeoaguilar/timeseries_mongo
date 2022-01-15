@@ -41,6 +41,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var mongoose_1 = __importDefault(require("mongoose"));
+var temperatureSchema_1 = __importDefault(require("../models/temperatureSchema"));
 var app = (0, express_1.default)();
 var connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
     var conn, error_1;
@@ -48,7 +49,7 @@ var connectDB = function () { return __awaiter(void 0, void 0, void 0, function 
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, mongoose_1.default.connect("mongodb://root:example@127.0.0.1:27017/temp")];
+                return [4 /*yield*/, mongoose_1.default.connect("mongodb://root:example@127.0.0.1:27017/Temperature")];
             case 1:
                 conn = _a.sent();
                 console.log("MongoDB connected: ".concat(conn.connection.host));
@@ -62,7 +63,50 @@ var connectDB = function () { return __awaiter(void 0, void 0, void 0, function 
         }
     });
 }); };
+var createMeasure = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var measure, createdTemp;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log(req.body);
+                measure = new temperatureSchema_1.default({
+                    "temperature": req.body.temperature,
+                    "timestamp": req.body.timestamp,
+                    "metadata": req.body.metadata
+                });
+                console.log("MO");
+                console.log(measure);
+                return [4 /*yield*/, measure.save()];
+            case 1:
+                createdTemp = _a.sent();
+                res.status(201).json(createdTemp);
+                return [2 /*return*/];
+        }
+    });
+}); };
+var getMeasures = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var temps;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log('read');
+                return [4 /*yield*/, temperatureSchema_1.default.find({})];
+            case 1:
+                temps = _a.sent();
+                res.json(temps);
+                return [2 /*return*/];
+        }
+    });
+}); };
+var router = express_1.default.Router();
+var port = 3000;
+app.use(express_1.default.json());
 connectDB();
-app.listen(3000, function () {
-    console.log('saludos');
+router.route('/')
+    .get(getMeasures)
+    .post(createMeasure);
+app.use('/', router);
+app.use(express_1.default.json());
+app.listen(port, function () {
+    console.log("Example app listening at http://localhost:".concat(port));
 });
