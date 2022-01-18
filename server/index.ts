@@ -55,18 +55,20 @@ const getAverage = async(req: express.Request,res: express.Response) => {
 }
 const getMin = async(req: express.Request,res: express.Response) => {
     console.log('read')
-    const temps = await Temperature.aggregate([
+    const temps = await Temperature.aggregate(   [
         {
        $match:{temperature:{$gte:0,$lte:24}}
        },
         {
           $group:
             {
-              _id: {year:{$year:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
-              minTemperature:{ $min: "$temperature" }
+              _id: {year:{$year:"$timestamp"},month:{$month:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
+              avgTemperature: { $avg: "$temperature" }
             }
-        }
-      ])
+        },
+       {$sort:{"_id.year":1,"_id.month":1,"_id.day":1,"_id.hour":1}}
+      ]
+   )
     
     
     res.json(temps)
@@ -81,10 +83,11 @@ const getMax = async(req: express.Request,res: express.Response) => {
         {
           $group:
             {
-              _id: {year:{$year:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
+                _id: {year:{$year:"$timestamp"},month:{$month:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
               maxTemperature:{ $max: "$temperature" }
             }
-        }
+        },
+        {$sort:{"_id.year":1,"_id.month":1,"_id.day":1,"_id.hour":1}}
       ])
     
     
