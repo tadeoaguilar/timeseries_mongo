@@ -26,7 +26,7 @@ const createMeasure = async(req: express.Request,res: express.Response) => {
             "timestamp": req.body.timestamp,
             "metadata": req.body.metadata
          }
-    )
+    )               
     console.log("MO")
     console.log(measure)
     const createdTemp = await measure.save()
@@ -34,9 +34,40 @@ const createMeasure = async(req: express.Request,res: express.Response) => {
     
 }
 
-const getMeasures = async(req: express.Request,res: express.Response) => {
+const getAverage = async(req: express.Request,res: express.Response) => {
     console.log('read')
-    const temps = await Temperature.find({})
+    const temps = await Temperature.aggregate(   [
+        {
+       $match:{temperature:{$gte:0,$lte:24}}
+       },
+        {
+          $group:
+            {
+              _id: {year:{$year:"$timestamp"},month:{$month:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
+              avgTemperature: { $avg: "$temperature" }
+            }
+        },
+       {$sort:{"_id.year,_id.month":1,"_id.day":1,"_id.hour":1}}
+      ])
+    
+    
+    res.json(temps)
+}
+const getMin = async(req: express.Request,res: express.Response) => {
+    console.log('read')
+    const temps = await Temperature.aggregate([
+        {
+       $match:{temperature:{$gte:0,$lte:24}}
+       },
+        {
+          $group:
+            {
+              _id: {year:{$year:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
+              minTemperature:{ $avg: "$temperature" }
+            }
+        }
+      ])
+    
     
     res.json(temps)
 }
@@ -46,9 +77,12 @@ const port = 3000
 app.use(express.json()) 
 connectDB()
 
-router.route('/')
-      .get(getMeasures)
+router.route('/')      
       .post(createMeasure)
+router.route('/average')
+        .get(getAverage)
+router.route('/min')
+        .get(getMin)
 app.use('/',router)
 
 
