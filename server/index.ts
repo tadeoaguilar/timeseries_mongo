@@ -63,7 +63,7 @@ const getMin = async(req: express.Request,res: express.Response) => {
           $group:
             {
               _id: {year:{$year:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
-              minTemperature:{ $avg: "$temperature" }
+              minTemperature:{ $min: "$temperature" }
             }
         }
       ])
@@ -72,6 +72,24 @@ const getMin = async(req: express.Request,res: express.Response) => {
     res.json(temps)
 }
 
+const getMax = async(req: express.Request,res: express.Response) => {
+    console.log('read')
+    const temps = await Temperature.aggregate([
+        {
+       $match:{temperature:{$gte:0,$lte:24}}
+       },
+        {
+          $group:
+            {
+              _id: {year:{$year:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
+              maxTemperature:{ $max: "$temperature" }
+            }
+        }
+      ])
+    
+    
+    res.json(temps)
+}
 const router = express.Router()
 const port = 3000
 app.use(express.json()) 
