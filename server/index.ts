@@ -101,6 +101,8 @@ router.route('/average')
         .get(getAverage)
 router.route('/min')
         .get(getMin)
+router.route('/max')
+        .get(getMax)
 app.use('/',router)
 
 
