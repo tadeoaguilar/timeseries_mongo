@@ -1,17 +1,22 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import Temperature from  '../models/temperatureSchema'
+import * as dotenv from 'dotenv'
 
+dotenv.config()
+
+//Use express to implement an HTTP service
 const app = express()
+
 
 const  connectDB = async () => {
 
     try {
-        const conn= await mongoose.connect("mongodb://root:example@127.0.0.1:27017/Temperature",)
+        const conn= await mongoose.connect(process.env.DATABASE_URL ?? '',)
 
         console.log(`MongoDB connected: ${conn.connection.host}`)
     } catch (error) {
-        console.error(`Error: ${error} connecting to: ${'mongodb://root:example@127.0.0.1:27017'}`)
+        console.error(`Error: ${error} connecting to: ${process.env.DATABASE_URL ?? ''}`)
         process.exit(1)
     }
 
@@ -19,7 +24,7 @@ const  connectDB = async () => {
 
 
 const createMeasure = async(req: express.Request,res: express.Response) => {
-    console.log(req.body)
+   
     const measure = new Temperature (
         {
             "temperature": req.body.temperature,
@@ -27,8 +32,7 @@ const createMeasure = async(req: express.Request,res: express.Response) => {
             "metadata": req.body.metadata
          }
     )               
-    console.log("MO")
-    console.log(measure)
+   
     const createdTemp = await measure.save()
     res.status(201).json(createdTemp)
     
@@ -75,7 +79,7 @@ const getMin = async(req: express.Request,res: express.Response) => {
 }
 
 const getMax = async(req: express.Request,res: express.Response) => {
-    console.log('read')
+    
     const temps = await Temperature.aggregate([
         {
        $match:{temperature:{$gte:0,$lte:24}}

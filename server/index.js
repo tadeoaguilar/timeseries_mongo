@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -42,21 +61,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var mongoose_1 = __importDefault(require("mongoose"));
 var temperatureSchema_1 = __importDefault(require("../models/temperatureSchema"));
+var dotenv = __importStar(require("dotenv"));
+dotenv.config();
+//Use express to implement an HTTP service
 var app = (0, express_1.default)();
 var connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
     var conn, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, mongoose_1.default.connect("mongodb://root:example@127.0.0.1:27017/Temperature")];
+                _c.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, mongoose_1.default.connect((_a = process.env.DATABASE_URL) !== null && _a !== void 0 ? _a : '')];
             case 1:
-                conn = _a.sent();
-                console.log("MongoDB connected: ".concat(conn.connection.host));
+                conn = _c.sent();
+                console.log("MongoDB connected Proc: ".concat(conn.connection.host));
                 return [3 /*break*/, 3];
             case 2:
-                error_1 = _a.sent();
-                console.error("Error: ".concat(error_1, " connecting to: ").concat('mongodb://root:example@127.0.0.1:27017'));
+                error_1 = _c.sent();
+                console.error("Error: ".concat(error_1, " connecting to: ").concat((_b = process.env.DATABASE_URL) !== null && _b !== void 0 ? _b : ''));
                 process.exit(1);
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
@@ -84,13 +107,74 @@ var createMeasure = function (req, res) { return __awaiter(void 0, void 0, void 
         }
     });
 }); };
-var getMeasures = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var getAverage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var temps;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 console.log('read');
-                return [4 /*yield*/, temperatureSchema_1.default.find({})];
+                return [4 /*yield*/, temperatureSchema_1.default.aggregate([
+                        {
+                            $match: { temperature: { $gte: 0, $lte: 24 } }
+                        },
+                        {
+                            $group: {
+                                _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
+                                avgTemperature: { $avg: "$temperature" }
+                            }
+                        },
+                        { $sort: { "_id.year,_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
+                    ])];
+            case 1:
+                temps = _a.sent();
+                res.json(temps);
+                return [2 /*return*/];
+        }
+    });
+}); };
+var getMin = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var temps;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log('read');
+                return [4 /*yield*/, temperatureSchema_1.default.aggregate([
+                        {
+                            $match: { temperature: { $gte: 0, $lte: 24 } }
+                        },
+                        {
+                            $group: {
+                                _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
+                                avgTemperature: { $avg: "$temperature" }
+                            }
+                        },
+                        { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
+                    ])];
+            case 1:
+                temps = _a.sent();
+                res.json(temps);
+                return [2 /*return*/];
+        }
+    });
+}); };
+var getMax = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var temps;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log('read');
+                return [4 /*yield*/, temperatureSchema_1.default.aggregate([
+                        {
+                            $match: { temperature: { $gte: 0, $lte: 24 } }
+                        },
+                        {
+                            $group: {
+                                _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
+                                maxTemperature: { $max: "$temperature" }
+                            }
+                        },
+                        { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
+                    ])];
             case 1:
                 temps = _a.sent();
                 res.json(temps);
@@ -103,8 +187,13 @@ var port = 3000;
 app.use(express_1.default.json());
 connectDB();
 router.route('/')
-    .get(getMeasures)
     .post(createMeasure);
+router.route('/average')
+    .get(getAverage);
+router.route('/min')
+    .get(getMin);
+router.route('/max')
+    .get(getMax);
 app.use('/', router);
 app.use(express_1.default.json());
 app.listen(port, function () {
