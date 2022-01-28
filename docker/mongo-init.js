@@ -1,12 +1,12 @@
 
 db.createUser(
     {
-        user: "root",
-        pwd: "example",
+        user: "root", //To change
+        pwd: "example", // To change
         roles: [
             {
                 role: "readWrite",
-                db: "Temperature"
+                db: "Temperature"   // Name of the database to create
             }
         ]
     }

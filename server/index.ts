@@ -3,6 +3,8 @@ import mongoose from 'mongoose'
 import Temperature from  '../models/temperatureSchema'
 import * as dotenv from 'dotenv'
 
+
+//Initialization of dotenv to read ENVIRONMENT variables
 dotenv.config()
 
 //Use express to implement an HTTP service
@@ -22,7 +24,8 @@ const  connectDB = async () => {
 
 }
 
-
+// POST 
+// Measure
 const createMeasure = async(req: express.Request,res: express.Response) => {
    
     const measure = new Temperature (
@@ -38,8 +41,10 @@ const createMeasure = async(req: express.Request,res: express.Response) => {
     
 }
 
+//Get
+//Average
 const getAverage = async(req: express.Request,res: express.Response) => {
-    console.log('read')
+    
     const temps = await Temperature.aggregate(   [
         {
        $match:{temperature:{$gte:0,$lte:24}}
@@ -79,7 +84,7 @@ const getMin = async(req: express.Request,res: express.Response) => {
 }
 
 const getMax = async(req: express.Request,res: express.Response) => {
-    
+   
     const temps = await Temperature.aggregate([
         {
        $match:{temperature:{$gte:0,$lte:24}}
@@ -102,20 +107,20 @@ const port = 3000
 app.use(express.json()) 
 connectDB()
 
-router.route('/')      
+router.route('/measures')      
       .post(createMeasure)
-router.route('/average')
+router.route('/measures/average')
         .get(getAverage)
-router.route('/min')
+router.route('/measures/min')
         .get(getMin)
-router.route('/max')
+router.route('/measures/max')
         .get(getMax)
 app.use('/',router)
 
 
-
+//To read Body as JSON
 app.use(express.json()) 
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`Temperature app listening at http://localhost:${port}`)
   })

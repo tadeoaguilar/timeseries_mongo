@@ -62,6 +62,7 @@ var express_1 = __importDefault(require("express"));
 var mongoose_1 = __importDefault(require("mongoose"));
 var temperatureSchema_1 = __importDefault(require("../models/temperatureSchema"));
 var dotenv = __importStar(require("dotenv"));
+//Initialization of dotenv to read ENVIRONMENT variables
 dotenv.config();
 //Use express to implement an HTTP service
 var app = (0, express_1.default)();
@@ -75,7 +76,7 @@ var connectDB = function () { return __awaiter(void 0, void 0, void 0, function 
                 return [4 /*yield*/, mongoose_1.default.connect((_a = process.env.DATABASE_URL) !== null && _a !== void 0 ? _a : '')];
             case 1:
                 conn = _c.sent();
-                console.log("MongoDB connected Proc: ".concat(conn.connection.host));
+                console.log("MongoDB connected: ".concat(conn.connection.host));
                 return [3 /*break*/, 3];
             case 2:
                 error_1 = _c.sent();
@@ -86,19 +87,18 @@ var connectDB = function () { return __awaiter(void 0, void 0, void 0, function 
         }
     });
 }); };
+// POST 
+// Measure
 var createMeasure = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var measure, createdTemp;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log(req.body);
                 measure = new temperatureSchema_1.default({
                     "temperature": req.body.temperature,
                     "timestamp": req.body.timestamp,
                     "metadata": req.body.metadata
                 });
-                console.log("MO");
-                console.log(measure);
                 return [4 /*yield*/, measure.save()];
             case 1:
                 createdTemp = _a.sent();
@@ -107,24 +107,24 @@ var createMeasure = function (req, res) { return __awaiter(void 0, void 0, void 
         }
     });
 }); };
+//Get
+//Average
 var getAverage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var temps;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                console.log('read');
-                return [4 /*yield*/, temperatureSchema_1.default.aggregate([
-                        {
-                            $match: { temperature: { $gte: 0, $lte: 24 } }
-                        },
-                        {
-                            $group: {
-                                _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
-                                avgTemperature: { $avg: "$temperature" }
-                            }
-                        },
-                        { $sort: { "_id.year,_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
-                    ])];
+            case 0: return [4 /*yield*/, temperatureSchema_1.default.aggregate([
+                    {
+                        $match: { temperature: { $gte: 0, $lte: 24 } }
+                    },
+                    {
+                        $group: {
+                            _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
+                            avgTemperature: { $avg: "$temperature" }
+                        }
+                    },
+                    { $sort: { "_id.year,_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
+                ])];
             case 1:
                 temps = _a.sent();
                 res.json(temps);
@@ -161,20 +161,18 @@ var getMax = function (req, res) { return __awaiter(void 0, void 0, void 0, func
     var temps;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                console.log('read');
-                return [4 /*yield*/, temperatureSchema_1.default.aggregate([
-                        {
-                            $match: { temperature: { $gte: 0, $lte: 24 } }
-                        },
-                        {
-                            $group: {
-                                _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
-                                maxTemperature: { $max: "$temperature" }
-                            }
-                        },
-                        { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
-                    ])];
+            case 0: return [4 /*yield*/, temperatureSchema_1.default.aggregate([
+                    {
+                        $match: { temperature: { $gte: 0, $lte: 24 } }
+                    },
+                    {
+                        $group: {
+                            _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
+                            maxTemperature: { $max: "$temperature" }
+                        }
+                    },
+                    { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
+                ])];
             case 1:
                 temps = _a.sent();
                 res.json(temps);
@@ -186,13 +184,13 @@ var router = express_1.default.Router();
 var port = 3000;
 app.use(express_1.default.json());
 connectDB();
-router.route('/')
+router.route('/measures')
     .post(createMeasure);
-router.route('/average')
+router.route('/measures/average')
     .get(getAverage);
-router.route('/min')
+router.route('/measures/min')
     .get(getMin);
-router.route('/max')
+router.route('/measures/max')
     .get(getMax);
 app.use('/', router);
 app.use(express_1.default.json());

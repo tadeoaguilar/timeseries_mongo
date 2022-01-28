@@ -1,5 +1,6 @@
 import {Schema, model} from "mongoose";
 
+//Type Script interface 
 interface Temperature {
     temperature: Number;
     timestamp: Date;
@@ -9,7 +10,10 @@ interface Temperature {
 }
 
 
-const tempSchema = new Schema<Temperature>({timestamp:{type: Date} , temperature: {type: Number} ,metadata:{type: Object}}, {
+const tempSchema = new Schema<Temperature>({timestamp:{type: Date} , 
+                                            temperature: {type: Number} ,
+                                            metadata:{type: Object}}, {
+    //Time Series Schema
     timeseries: {
       timeField: 'timestamp',
       metaField: 'metadata',
@@ -23,6 +27,6 @@ const tempSchema = new Schema<Temperature>({timestamp:{type: Date} , temperature
 
   export default TemperatureModel;
 
-  // `Test` collection will be a timeseries collection
+
   
   

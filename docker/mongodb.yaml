@@ -1,15 +1,15 @@
-version: '3.1'
+version: '3.1'   # version of the file
 
 services:
 
   mongo:
-    image: mongo
+    image: mongo    # Mongo Imaage
     restart: always
     ports:
-      - 27017:27017
+      - 27017:27017    #Port to be exposed 
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: Temperature
+      MONGO_INITDB_ROOT_USERNAME: root   # Initial user
+      MONGO_INITDB_ROOT_PASSWORD: example # Initial  password
+      MONGO_INITDB_DATABASE: Temperature  # IDatabase name
     volumes:
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro #Script to run at initialization
