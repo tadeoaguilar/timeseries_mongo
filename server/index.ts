@@ -71,7 +71,7 @@ connectDB()
 
 router.route('/measures')      
       .post(createMeasure)
-router.route('/measures/average')
+router.route('/measures/statistics')
         .get(getStats)
 
 app.use('/',router)
