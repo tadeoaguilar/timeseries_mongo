@@ -41,28 +41,8 @@ const createMeasure = async(req: express.Request,res: express.Response) => {
     
 }
 
-//Get
-//Average
-const getAverage = async(req: express.Request,res: express.Response) => {
-    
-    const temps = await Temperature.aggregate(   [
-        {
-       $match:{temperature:{$gte:0,$lte:24}}
-       },
-        {
-          $group:
-            {
-              _id: {year:{$year:"$timestamp"},month:{$month:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
-              avgTemperature: { $avg: "$temperature" }
-            }
-        },
-       {$sort:{"_id.year,_id.month":1,"_id.day":1,"_id.hour":1}}
-      ])
-    
-    
-    res.json(temps)
-}
-const getMin = async(req: express.Request,res: express.Response) => {
+
+const getStats = async(req: express.Request,res: express.Response) => {
     console.log('read')
     const temps = await Temperature.aggregate(   [
         {
@@ -72,7 +52,7 @@ const getMin = async(req: express.Request,res: express.Response) => {
           $group:
             {
               _id: {year:{$year:"$timestamp"},month:{$month:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
-              avgTemperature: { $avg: "$temperature" }
+              avgTemperature: { $avg: "$temperature" },  maxTemperature:{ $max: "$temperature" }, minTemperature:{ $min: "$temperature" }
             }
         },
        {$sort:{"_id.year":1,"_id.month":1,"_id.day":1,"_id.hour":1}}
@@ -83,25 +63,7 @@ const getMin = async(req: express.Request,res: express.Response) => {
     res.json(temps)
 }
 
-const getMax = async(req: express.Request,res: express.Response) => {
-   
-    const temps = await Temperature.aggregate([
-        {
-       $match:{temperature:{$gte:0,$lte:24}}
-       },
-        {
-          $group:
-            {
-                _id: {year:{$year:"$timestamp"},month:{$month:"$timestamp"},day:{$dayOfMonth:"$timestamp"},hour:{$hour:"$timestamp"}},
-              maxTemperature:{ $max: "$temperature" }
-            }
-        },
-        {$sort:{"_id.year":1,"_id.month":1,"_id.day":1,"_id.hour":1}}
-      ])
-    
-    
-    res.json(temps)
-}
+
 const router = express.Router()
 const port = 3000
 app.use(express.json()) 
@@ -110,11 +72,8 @@ connectDB()
 router.route('/measures')      
       .post(createMeasure)
 router.route('/measures/average')
-        .get(getAverage)
-router.route('/measures/min')
-        .get(getMin)
-router.route('/measures/max')
-        .get(getMax)
+        .get(getStats)
+
 app.use('/',router)
 
 
