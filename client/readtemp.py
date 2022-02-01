@@ -12,7 +12,7 @@ while True:
     #current_time = now.strftime("%Y-%M %H:%M:%S")
     #data= { 'sensorId': sensor.id, 'timestamp': now , 'temp': temperature}
     try:
-        response = requests.post('http://192.168.2.34:3000/',json={'metadata':{'sensorId': sensor.id}, 'timestamp': now , 'temperature': temperature})
+        response = requests.post('http://192.168.2.34:3000/measures',json={'metadata':{'sensorId': sensor.id}, 'timestamp': now , 'temperature': temperature})
     except:
         print('error')
     print("The Temperature is " , temperature, "at ",now, "sensor id:",sensor.id)
