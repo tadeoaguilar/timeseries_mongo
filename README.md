@@ -71,4 +71,4 @@ URL: http://localhost:3000/measures
 
 curl http://localhost:3000/measures/stats
 
-10. To know how to implement the Raspberry PI, please refer to the following article. [Time Series with Mongo DB] ()
+10. To know how to implement the Raspberry PI, please refer to the following article. [Time Series with Mongo DB] (https://blog.tadeoaguilar.dev/time-series-databases-an-implementation-in-mongodb-express-and-raspberry-pi)
