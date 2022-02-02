@@ -107,32 +107,7 @@ var createMeasure = function (req, res) { return __awaiter(void 0, void 0, void 
         }
     });
 }); };
-//Get
-//Average
-var getAverage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var temps;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, temperatureSchema_1.default.aggregate([
-                    {
-                        $match: { temperature: { $gte: 0, $lte: 24 } }
-                    },
-                    {
-                        $group: {
-                            _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
-                            avgTemperature: { $avg: "$temperature" }
-                        }
-                    },
-                    { $sort: { "_id.year,_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
-                ])];
-            case 1:
-                temps = _a.sent();
-                res.json(temps);
-                return [2 /*return*/];
-        }
-    });
-}); };
-var getMin = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var getStats = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var temps;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -145,34 +120,11 @@ var getMin = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                         {
                             $group: {
                                 _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
-                                avgTemperature: { $avg: "$temperature" }
+                                avgTemperature: { $avg: "$temperature" }, maxTemperature: { $max: "$temperature" }, minTemperature: { $min: "$temperature" }
                             }
                         },
                         { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
                     ])];
-            case 1:
-                temps = _a.sent();
-                res.json(temps);
-                return [2 /*return*/];
-        }
-    });
-}); };
-var getMax = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var temps;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, temperatureSchema_1.default.aggregate([
-                    {
-                        $match: { temperature: { $gte: 0, $lte: 24 } }
-                    },
-                    {
-                        $group: {
-                            _id: { year: { $year: "$timestamp" }, month: { $month: "$timestamp" }, day: { $dayOfMonth: "$timestamp" }, hour: { $hour: "$timestamp" } },
-                            maxTemperature: { $max: "$temperature" }
-                        }
-                    },
-                    { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1, "_id.hour": 1 } }
-                ])];
             case 1:
                 temps = _a.sent();
                 res.json(temps);
@@ -186,14 +138,11 @@ app.use(express_1.default.json());
 connectDB();
 router.route('/measures')
     .post(createMeasure);
-router.route('/measures/average')
-    .get(getAverage);
-router.route('/measures/min')
-    .get(getMin);
-router.route('/measures/max')
-    .get(getMax);
+router.route('/measures/stats')
+    .get(getStats);
 app.use('/', router);
+//To read Body as JSON
 app.use(express_1.default.json());
 app.listen(port, function () {
-    console.log("Example app listening at http://localhost:".concat(port));
+    console.log("Temperature app listening at http://localhost:".concat(port));
 });

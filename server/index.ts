@@ -14,7 +14,7 @@ const app = express()
 const  connectDB = async () => {
 
     try {
-        const conn= await mongoose.connect(process.env.DATABASE_URL ?? '',)
+        const conn= await mongoose.connect(process.env.DATABASE_URL ?? 'mongodb://root:example@127.0.0.1:27017/Temperature',)
 
         console.log(`MongoDB connected: ${conn.connection.host}`)
     } catch (error) {
@@ -43,7 +43,7 @@ const createMeasure = async(req: express.Request,res: express.Response) => {
 
 
 const getStats = async(req: express.Request,res: express.Response) => {
-    console.log('read')
+    
     const temps = await Temperature.aggregate(   [
         {
        $match:{temperature:{$gte:0,$lte:24}}
