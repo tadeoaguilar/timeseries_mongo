@@ -67,7 +67,7 @@ URL: http://localhost:3000/measures
 "metadata": {"sensorid":123}
 }
 ```
-9. TO read statisitcs, You just need to send a GET action to our endpoint for statistics
+9. To read statisitcs, You just need to send a GET action to our endpoint for statistics
 
 curl http://localhost:3000/measures/stats
 
