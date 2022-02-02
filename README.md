@@ -66,7 +66,7 @@ URL: http://localhost:3000/measures
 "timestamp": "2022-06-19T20:00:00.000Z",
 "metadata": {"sensorid":123}
 }
-
+```
 9. TO read statisitcs, You just need to send a GET action to our endpoint for statistics
 
 curl http://localhost:3000/measures/stats
